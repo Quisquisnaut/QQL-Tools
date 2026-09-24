@@ -52,12 +52,24 @@ def _is_safe_name(name: str) -> bool:
 
 def parse_package(path: Path) -> PackageContents:
     with zipfile.ZipFile(path) as archive:
-        original_names = archive.namelist()
+        infos = archive.infolist()
+        original_names = [info.filename for info in infos]
         normalized_names, had_wrapper = _normalize_zip_names(original_names, path.name)
-        name_map = dict(zip(normalized_names, original_names, strict=True))
-        for normalized_name in normalized_names:
+        normalized_infos = list(zip(normalized_names, infos, strict=True))
+        name_map = {
+            normalized_name: info.filename
+            for normalized_name, info in normalized_infos
+            if not info.is_dir()
+        }
+        for normalized_name, info in normalized_infos:
+            if had_wrapper and info.is_dir() and normalized_name == "":
+                continue
             if not _is_safe_name(normalized_name):
                 raise ValueError(f"Unsafe archive path: {normalized_name}")
+            if info.is_dir():
+                if normalized_name == "media/":
+                    continue
+                raise ValueError(f"Unexpected archive entry: {normalized_name}")
             if normalized_name in {PACKAGE_MANIFEST_NAME, COURSE_JSON_NAME}:
                 continue
             if _MEDIA_ENTRY_RE.fullmatch(normalized_name):
@@ -71,7 +83,13 @@ def parse_package(path: Path) -> PackageContents:
         if any(key not in {"packageFormat", "sharedImageSources"} for key in manifest):
             raise ValueError("Unsupported package manifest keys")
         course_json = archive.read(name_map[COURSE_JSON_NAME])
-        media_entries = tuple(sorted(name for name in normalized_names if name.startswith("media/")))
+        media_entries = tuple(
+            sorted(
+                normalized_name
+                for normalized_name, info in normalized_infos
+                if not info.is_dir() and normalized_name.startswith("media/")
+            )
+        )
         return PackageContents(
             manifest=manifest,
             course_json=course_json,
