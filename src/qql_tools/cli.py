@@ -120,28 +120,23 @@ def format_validation_report(path: Path, report: Any) -> str:
     path = path.resolve()
     details = _collect_display_details(path)
     notes = list(dict.fromkeys([*report.notes, *details.notes]))
+    metadata_lines = [f"Path: {path}"]
+    if details.input_type is not None:
+        metadata_lines.append(f"Input: {details.input_type}")
+    if details.course_model_version is not None:
+        metadata_lines.append(f"Detected Course Model version: {details.course_model_version}")
+    if details.package_format is not None:
+        metadata_lines.append(f"Detected package format: {details.package_format}")
     lines: list[str] = []
 
     if not report.is_valid:
         lines.append("Result: INVALID")
-        lines.append(f"Path: {path}")
-        if details.input_type is not None:
-            lines.append(f"Input: {details.input_type}")
-        if details.course_model_version is not None:
-            lines.append(f"Detected Course Model version: {details.course_model_version}")
-        if details.package_format is not None:
-            lines.append(f"Detected package format: {details.package_format}")
+        lines.extend(metadata_lines)
         lines.append("")
         lines.append("Errors:")
         lines.extend(_format_error(error.location, error.message) for error in report.errors)
     else:
-        lines.append(f"Path: {path}")
-        if details.input_type is not None:
-            lines.append(f"Input: {details.input_type}")
-        if details.course_model_version is not None:
-            lines.append(f"Detected Course Model version: {details.course_model_version}")
-        if details.package_format is not None:
-            lines.append(f"Detected package format: {details.package_format}")
+        lines.extend(metadata_lines)
         lines.append(f"Result: {_result_text(report.is_valid, report.is_fully_valid)}")
 
     if report.implemented_checks:

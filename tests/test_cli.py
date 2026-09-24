@@ -4,9 +4,9 @@ import json
 import zipfile
 from pathlib import Path
 
-from qql_tools import cli
-from qql_tools.cli import ValidationDisplayDetails, main
-from qql_tools.qql.validator import ValidationReport, validate_path
+from qql_tools.cli import main
+from qql_tools.qql import validator as validator_module
+from qql_tools.qql.validator import validate_path
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "qql"
 
@@ -51,33 +51,17 @@ def test_validate_cli_human_readable_partial_output_for_package(
     assert "Accepted a single enclosing folder matching the ZIP filename stem." in output
 
 
-def test_validate_cli_human_readable_full_valid_output(
-    tmp_path: Path, capsys, monkeypatch
-) -> None:
-    course_path = tmp_path / "course.json"
-    course_path.write_text("{}", encoding="utf-8")
-
-    monkeypatch.setattr(
-        cli,
-        "validate_path",
-        lambda path: ValidationReport(
-            source=str(path),
-            unsupported_checks=[],
-        ),
-    )
-    monkeypatch.setattr(
-        cli,
-        "_collect_display_details",
-        lambda path: ValidationDisplayDetails(
-            input_type="JSON Course",
-            course_model_version=11,
-        ),
-    )
+def test_validate_cli_human_readable_full_valid_output(capsys, monkeypatch) -> None:
+    course_path = FIXTURES / "minimal_valid_course.json"
+    monkeypatch.setattr(validator_module, "UNSUPPORTED_VALIDATION_SCOPE", ())
 
     exit_code = main(["validate", str(course_path)])
 
     assert exit_code == 0
     output = capsys.readouterr().out
+    assert f"Path: {course_path.resolve()}" in output
+    assert "Input: JSON Course" in output
+    assert "Detected Course Model version: 11" in output
     assert "Result: FULLY VALID" in output
     assert "Checks not yet implemented:" not in output
 
