@@ -93,9 +93,9 @@ def test_validate_cli_human_readable_invalid_output(capsys) -> None:
     assert lines[0] == "Result: INVALID"
     assert f"Path: {course_path.resolve()}" in output
     assert "Input: JSON Course" in output
-    assert "Detected Course Model version: 10" in output
+    assert "Detected Course Model version: 99" in output
     assert "Errors:" in output
-    assert "- formatVersion: Supported QQL course model is 11; found 10." in output
+    assert "- formatVersion: Supported QQL course model is 11; found 99." in output
     assert output.index("Errors:") < output.index("Checks performed:")
 
 
