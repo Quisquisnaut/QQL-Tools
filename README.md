@@ -73,6 +73,8 @@ Try the conservative validator:
 python -m qql_tools.cli validate fixtures/qql/minimal_valid_course.json
 ```
 
+The current validator returns a non-zero exit code when unsupported checks remain, so it does not silently claim complete validity while the independent rule set is still incomplete.
+
 ## License
 
 QQL-Tools is licensed under the Mozilla Public License 2.0 (MPL-2.0), matching QuisquisLingo so reusable format and validation logic can move between the repositories without unnecessary relicensing friction.

@@ -57,6 +57,20 @@ def test_malformed_package_structure_reported(tmp_path: Path) -> None:
     assert report.errors[0].code == "invalid-package"
 
 
+def test_unsupported_package_version_reported(tmp_path: Path) -> None:
+    package_path = tmp_path / "bad-format.zip"
+    course_bytes = (FIXTURES / "minimal_valid_course.json").read_bytes()
+    with zipfile.ZipFile(package_path, "w") as archive:
+        archive.writestr("qql-course-package.json", json.dumps({"packageFormat": 2}))
+        archive.writestr("course.json", course_bytes)
+
+    report = validate_path(package_path)
+
+    assert report.is_valid is False
+    assert report.errors[0].code == "invalid-package"
+    assert "Unsupported package format" in report.errors[0].message
+
+
 def test_unsafe_archive_path_handling(tmp_path: Path) -> None:
     package_path = tmp_path / "unsafe.zip"
     with zipfile.ZipFile(package_path, "w") as archive:
