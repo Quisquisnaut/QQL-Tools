@@ -1,0 +1,13 @@
+"""QQL-Tools foundation package."""
+
+from .qql.versions import (
+    QQL_CANONICAL_EXERCISE_MODELS,
+    QQL_COURSE_MODEL_VERSION,
+    QQL_PACKAGE_FORMAT_VERSION,
+)
+
+__all__ = [
+    "QQL_CANONICAL_EXERCISE_MODELS",
+    "QQL_COURSE_MODEL_VERSION",
+    "QQL_PACKAGE_FORMAT_VERSION",
+]
