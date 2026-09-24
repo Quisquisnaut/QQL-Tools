@@ -50,10 +50,11 @@ def _matching_wrapper_prefix(names: list[str], archive_name: str | None) -> str 
 
 
 def _normalize_zip_names(names: list[str], archive_name: str | None) -> tuple[list[str], bool]:
-    prefix = _matching_wrapper_prefix(names, archive_name)
+    file_names = [name for name in names if not name.endswith("/")]
+    prefix = _matching_wrapper_prefix(file_names, archive_name)
     if prefix is None:
-        return names, False
-    return [name[len(prefix) :] for name in names], True
+        return file_names, False
+    return [name[len(prefix) :] for name in file_names], True
 
 
 def _detect_course_model_version(raw: bytes) -> Any | None:

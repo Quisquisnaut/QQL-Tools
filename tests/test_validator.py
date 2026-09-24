@@ -28,6 +28,24 @@ def test_known_valid_minimal_qql_fixture(tmp_path: Path) -> None:
     assert report.unsupported_checks
 
 
+def test_matching_wrapper_folder_with_directory_entry_is_accepted(tmp_path: Path) -> None:
+    course_bytes = (FIXTURES / "minimal_valid_course.json").read_bytes()
+    package_path = tmp_path / "minimal_valid_package.zip"
+    with zipfile.ZipFile(package_path, "w") as archive:
+        archive.writestr("minimal_valid_package/", "")
+        archive.writestr(
+            "minimal_valid_package/qql-course-package.json",
+            json.dumps({"packageFormat": 1}),
+        )
+        archive.writestr("minimal_valid_package/course.json", course_bytes)
+
+    report = validate_path(package_path)
+
+    assert report.is_valid is True
+    assert report.errors == []
+    assert "Accepted a single enclosing folder matching the ZIP filename stem." in report.notes
+
+
 def test_malformed_json_reported() -> None:
     report = validate_course_json_bytes(
         (FIXTURES / "malformed.json").read_bytes(),
