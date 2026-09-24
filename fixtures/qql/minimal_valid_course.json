@@ -1,0 +1,32 @@
+{
+  "formatVersion": 11,
+  "publicationState": "draft",
+  "lessonNumberingMode": "lesson",
+  "defaultLessonIconStyle": "monochrome",
+  "courseId": "demo-course-1",
+  "title": "Minimal Demo Course",
+  "lessons": [
+    {
+      "lessonId": "lesson-1",
+      "publicationState": "draft",
+      "updatedAt": "2026-09-24T00:00:00.000Z",
+      "title": "Lesson 1",
+      "guidebook": {
+        "content": []
+      },
+      "duel": {
+        "id": "duel-1"
+      },
+      "rounds": [
+        {
+          "id": "round-1",
+          "publicationState": "draft",
+          "updatedAt": "2026-09-24T00:00:00.000Z",
+          "title": "Round 1",
+          "visualType": "generic",
+          "content": []
+        }
+      ]
+    }
+  ]
+}
